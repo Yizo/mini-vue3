@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="module">
+        import { reactive, effect }  from './reactivity.esm.js'
+        debugger
+        const state = reactive({ name: 'jw', age: 30 })
+        const p1 = reactive(state)
+        const app = document.getElementById('app')
+        effect(() => { // 副作用函数 默认执行一次，响应式数据变化后再次执行
+            app.innerHTML = state.name + '今年' + state.age + '岁了'
+        });
+        setTimeout(() => {
+            state.age++;
+        }, 1000)
+    </script>
+</head>
+<body>
+<div id="app"></div>
+</body>
+</html>

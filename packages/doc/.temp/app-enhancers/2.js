@@ -1,0 +1,1 @@
+export { default } from "D:\\git\\20221107\\node_modules\\.pnpm\\vuepress-plugin-code-copy@1.0.6\\node_modules\\vuepress-plugin-code-copy\\appFile.js"
