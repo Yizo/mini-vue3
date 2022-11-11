@@ -13,7 +13,9 @@
             app.innerHTML = state.name + '今年' + state.age + '岁了'
         });
         setTimeout(() => {
-            state.age++;
+            effect(()=>{
+                state.age++;
+            })
         }, 1000)
     </script>
 </head>
