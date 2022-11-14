@@ -5,18 +5,21 @@
     <title>Title</title>
     <script type="module">
         import { reactive, effect }  from './reactivity.esm.js'
-        debugger
-        const state = reactive({ name: 'jw', age: 30 })
+        const state = reactive({ flag: false, name: 'jw', age: 30 })
         const p1 = reactive(state)
         const app = document.getElementById('app')
         effect(() => { // 副作用函数 默认执行一次，响应式数据变化后再次执行
-            app.innerHTML = state.name + '今年' + state.age + '岁了'
+            console.log('runner')
+            app.innerHTML = state.flag ? state.name : state.age
         });
         setTimeout(() => {
-            effect(()=>{
-                state.age++;
+            debugger;
+            state.flag = !state.flag;
+            setTimeout(()=>{
+                console.log('修改了值age')
+                state.age = 31
             })
-        }, 1000)
+        }, 2000)
     </script>
 </head>
 <body>

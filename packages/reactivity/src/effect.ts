@@ -1,9 +1,17 @@
 export let activeEffect = undefined
 
+function cleanupEffect(effect) {
+let { deps } = effect
+    for(let i = 0; i<deps.length; i++) {
+        deps[i].delete(effect)
+    }
+    effect.deps.length = 0
+}
+
 class ReactiveEffect {
     public active = true
-    public deps = []
-    public parent = undefined
+    public deps = []  // effect中的响应式数据
+    public parent = undefined  // effect的父级
     constructor(public fn) {}
     run(){
         if(!this.active) {
@@ -12,8 +20,10 @@ class ReactiveEffect {
         // 构建tree树父子关系
         try{
             this.parent = activeEffect
-            activeEffect = this
-            return this.fn()
+            activeEffect = this  // 把自己暴露在全局上
+            // 每次执行effect之前，应该先清理effect中所以依赖的属性
+            cleanupEffect(this)
+            return this.fn() // 触发依赖收集
         } finally {
             activeEffect = this.parent
             this.parent = undefined
@@ -56,9 +66,24 @@ export function track(target, key) {
     if(!dep) {
         depsMap.set(key, dep = new Set())
     }
+    // 属性依赖的effect是否存在
     let shouldTrack = dep.has(activeEffect)
     if(shouldTrack) {
         dep.add(activeEffect)
         activeEffect.deps.push(dep)
     }
+}
+
+export function trigger(target, key, newValue, oldValue) {
+    const depsMap = targetMap.get(target)
+    if(!depsMap) return;
+    const dep = depsMap.get(key)
+    if(!dep)return;
+    const effects = [...dep]
+    effects.forEach(effect=>{
+        // 避免重复调用，造成栈异常
+        if(effect !== activeEffect) {
+            effect.run()
+        }
+    })
 }
